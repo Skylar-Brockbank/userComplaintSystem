@@ -11,6 +11,18 @@ const bcrypt = require("bcrypt");
 const flash = require("express-flash");
 const session = require("express-session");
 
+const sql = require("./serverUtils/pgUtils.js");
+
+//You are planning to create a docker file for a redis container and
+//then replace the global variable you have with a redis database.
+
+// const initializePassport = require("./serverUtils/passport-config.js")
+// initializePassport(passport, (name)=>{
+//   return usrData.find(e=>e.name==name);
+// },(id)=>{
+//   return usrData.find(e=>e.id==id);
+// })
+
 const initializePassport = require("./serverUtils/passport-config.js")
 initializePassport(passport, (name)=>{
   return usrData.find(e=>e.name==name);
@@ -18,6 +30,7 @@ initializePassport(passport, (name)=>{
   return usrData.find(e=>e.id==id);
 })
 
+// Beginning of the old database system
 let usrData='';
 try{
   const dataString = fs.readFileSync('./resources/config.json');
@@ -29,6 +42,9 @@ try{
 function updateUserData(){
   fs.writeFileSync('./resources/config.json',JSON.stringify(usrData));
 }
+
+//End of the old DB section
+
 
 const app = express();
 
