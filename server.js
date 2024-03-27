@@ -13,37 +13,33 @@ const session = require("express-session");
 
 const sql = require("./serverUtils/pgUtils.js");
 
-//You are planning to create a docker file for a redis container and
-//then replace the global variable you have with a redis database.
-
-// const initializePassport = require("./serverUtils/passport-config.js")
-// initializePassport(passport, (name)=>{
-//   return usrData.find(e=>e.name==name);
-// },(id)=>{
-//   return usrData.find(e=>e.id==id);
-// })
 
 const initializePassport = require("./serverUtils/passport-config.js")
-initializePassport(passport, (name)=>{
-  return usrData.find(e=>e.name==name);
-},(id)=>{
-  return usrData.find(e=>e.id==id);
-})
+initializePassport(passport)
 
-// Beginning of the old database system
-let usrData='';
-try{
-  const dataString = fs.readFileSync('./resources/config.json');
-  usrData=JSON.parse(dataString);
-}catch(err){
-  console.log(err);
+
+async function createUser(name, password){
+  console.log("running create user")
+  const userSearch = await sql`select * from users where name=${name};`
+  console.log(userSearch);
+  console.log(userSearch.length);
+  if (userSearch.length<1){
+    console.log("running insert");
+    const user = await sql`
+      insert into users
+      (id, name, password)
+      values
+      (${uuid.v4()},${name},${password})
+      returning name;
+    `
+    console.log(user);
+    console.log("done")
+    return true;
+  }else{
+    return false;
+  }
+
 }
-
-function updateUserData(){
-  fs.writeFileSync('./resources/config.json',JSON.stringify(usrData));
-}
-
-//End of the old DB section
 
 
 const app = express();
@@ -100,23 +96,17 @@ app.post("/login", passport.authenticate('local',{
 }))
 
 app.get("/register",notAuthCheck, (req,res)=>{
-  res.render("register",{msg:""});
+  res.render("register");
 })
 
 app.post("/register",notAuthCheck, async(req,res)=>{
   try{
-    //We use a try statement because this is an asynch function
-    //bcrypt is encrypting the password here
     const pass = await bcrypt.hash(req.body.password, 10);
-    //here we check to make sure that this username isn't already in use
-    if(!usrData.find(e=>{e.name==req.body.name})){
-      //here we are pushing the new user object to usrData
-      usrData.push({id:uuid.v4(),name:req.body.name,pass:pass});
-      //then we call the updateUserData function to sync the file
-      updateUserData();
-      res.redirect("/login")
+    if (await createUser(req.body.name,pass)){
+      res.redirect("/login");
     }else{
-      res.render("register",{msg:"username is taken"})
+      req.flash('error','That user already exists');
+      res.render("register");
     }
   }catch(err){
     res.status(err);

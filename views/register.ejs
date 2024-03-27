@@ -14,11 +14,14 @@
         </div>
         <div class="card">
             <div class="container p-5 w-50">
+              <% if(messages.error){%>
+                <div class="alert alert-danger">
+                  <%= messages.error%>
+                </div>
+                <%}%>
                 <form class="card p-5"id="registrationForm" action="/register" method="post">
                   <div class="d-flex flex-column justify-content-end">
-                    <% if(msg.length>0){%>
-                        <p><%= msg%></p>
-                    <%}%>
+                    
                       <label for="name">
                           Username:
                     </label>
