@@ -3,7 +3,6 @@ if(process.env.NODE_ENV !== 'production'){
 }
 
 const express = require("express");
-const fs = require("fs");
 
 const uuid = require("uuid");
 const passport = require("passport");
@@ -72,23 +71,15 @@ function notAuthCheck(req,res,next){
     return next();
   }
 }
-//Views
+
 app.get("/", (req, res) => {
   res.render('index');
 })
-
 
 app.get("/login",notAuthCheck, (req, res) => {
   res.render('login');
 })
 
-// app.post("/login", async(req,res)=>{
-//   if(await bcrypt.compare(req.body.password,usrData[req.body.name].pass)){
-//     res.redirect("/dashboard/"+usrData[req.body.name].id);
-//   }else{
-//     res.status(401).send();
-//   }
-//})
 app.post("/login", passport.authenticate('local',{
   successRedirect:'dashboard',
   failureRedirect: 'login',
