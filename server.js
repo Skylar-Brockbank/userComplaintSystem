@@ -76,6 +76,10 @@ app.get("/", (req, res) => {
   res.render('index');
 })
 
+app.get("/portal",(req,res)=>{
+  res.render('portal');
+})
+
 app.get("/login",notAuthCheck, (req, res) => {
   res.render('login');
 })
