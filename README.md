@@ -50,6 +50,7 @@ A basic web application for taking and managing user feedback
 
 * Create and/or navigate to the directory you would like to contain this project on your computer.
 * Type git clone https://github.com/Skylar-Brockbank/userComplaintSystem to clone the repository to your local machine.
+* You'll need to create a file called `.env` where you will specify values for `SESSION_SECRET, PG_HOST, DB_NAME, PG_USERNAME, PG_PASSWORD`
 * Run `docker-compose up -d` to start the postgres container in detatched mode
 * Run `node scripts/initializePG.js` to set up the database tables
 * Run `node server` to start the application server
